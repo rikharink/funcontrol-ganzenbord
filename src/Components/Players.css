@@ -1,0 +1,38 @@
+.players {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.player {
+  --player-size: 20px;
+  color: white;
+  border: 2px solid black;
+  margin: 4px;
+  border-radius: 50%;
+  width: var(--player-size);
+  height: var(--player-size);
+  display: table-cell;
+  vertical-align: center;
+  text-align: center;
+}
+
+.player-1 {
+  background: blue;
+}
+.player-2 {
+  background: red;
+}
+.player-3 {
+  background: green;
+}
+.player-4 {
+  background: blueviolet;
+}
+.player-5 {
+  background: hotpink;
+}
+.player-6 {
+  background: orange;
+}

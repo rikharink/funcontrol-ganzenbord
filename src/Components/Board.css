@@ -1,0 +1,51 @@
+:root {
+  --square-size: min(9vh, 9vw);
+}
+
+.board-grid {
+  width: calc(10 * var(--square-size));
+}
+
+.square {
+  width: var(--square-size);
+  height: var(--square-size);
+  display: flex;
+  flex-basis: var(--square-size);
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  background: ghostwhite;
+  border: 1px solid black;
+  text-align: center;
+}
+
+.goose {
+  background: navy;
+  color: ghostwhite;
+}
+
+.square-0 {
+  border-top-left-radius: 25%;
+}
+
+.square-9 {
+  border-top-right-radius: 25%;
+}
+
+.square-60 {
+  border-bottom-left-radius: 25%;
+}
+
+.square-50,
+.square-63 {
+  border-bottom-right-radius: 25%;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.row:nth-child(2n) {
+  flex-direction: row-reverse;
+}
