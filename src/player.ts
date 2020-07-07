@@ -4,4 +4,5 @@ export interface Player {
   location: number;
   isStuck: boolean;
   skipTurn: boolean;
+  wins: number;
 }

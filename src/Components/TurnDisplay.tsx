@@ -1,8 +1,8 @@
+import "react-dice-complete/dist/react-dice-complete.css";
 import Modal from "react-modal";
 import React, { useState, useEffect } from "react";
 import { useGlobalState } from "../state";
 import ReactDice from "react-dice-complete";
-import "react-dice-complete/dist/react-dice-complete.css";
 import GameEventDisplay, { GameEvent } from "./GameEventDisplay";
 
 Modal.setAppElement("#root");
@@ -15,19 +15,26 @@ function TurnDisplay() {
   const [currentPlayer, setCurrentPlayer] = useGlobalState("currentPlayer");
   const [dice, setDice] = useState<any>();
   const [event, setEvent] = useState<GameEvent>(GameEvent.None);
-  const [, setLastRoll] = useGlobalState("lastRoll");
+  const [, setLastTurn] = useGlobalState("lastTurn");
   const [, setIsPlaying] = useGlobalState("isPlaying");
   const [turnOne, setTurnOne] = useGlobalState("turnOne");
+  const [automate] = useGlobalState("automate");
+  const [, updateDraws] = useGlobalState("draws");
 
   const customStyle: Modal.Styles = {
     content: {
-      top: "50%",
+      top: "8px",
       left: "50%",
       right: "auto",
       bottom: "auto",
       marginRight: "-50%",
-      transform: "translate(-50%, -50%)",
+      transform: "translate(-50%, 0)",
       textAlign: "center",
+      pointerEvents: "visible",
+    },
+    overlay: {
+      background: undefined,
+      pointerEvents: "none",
     },
   };
 
@@ -49,7 +56,15 @@ function TurnDisplay() {
       postRollLocation += total;
     }
     if (postRollLocation > 63) {
-      postRollLocation -= postRollLocation - 63;
+      const overshoot = postRollLocation - 63;
+      postRollLocation = 63 - overshoot;
+      console.log(
+        "Overshoot Icurrent, roll, postroll, overshoot)",
+        currentLocation,
+        total,
+        postRollLocation,
+        overshoot
+      );
     }
     switch (postRollLocation) {
       case 6:
@@ -78,11 +93,29 @@ function TurnDisplay() {
         break;
       case 63:
         setEvent(GameEvent.Done);
-        setIsPlaying(false);
-        setPlayers([]);
+        break;
     }
     movePlayer(postRollLocation);
-    setLastRoll(total);
+    setLastTurn({
+      from: currentLocation,
+      to: postRollLocation,
+      player: players[currentPlayer],
+      roll: total,
+    });
+    if (players[currentPlayer].location === 63) {
+      players[currentPlayer].wins++;
+      if (!automate) {
+        setIsPlaying(false);
+      }
+      resetForNextGame();
+    }
+    setPlayers([...players]);
+    if (automate) {
+      setTimeout(() => {
+        nextTurn();
+        dice?.rollAll();
+      }, 1000);
+    }
   }
 
   function stuck(location: number) {
@@ -92,22 +125,40 @@ function TurnDisplay() {
     players[currentPlayer].isStuck = true;
     if (players.filter((p) => p.isStuck).length === players.length) {
       setEvent(GameEvent.Stuck);
-      setIsPlaying(false);
+      updateDraws((d) => d++);
+      if (!automate) {
+        setIsPlaying(false);
+      }
+      resetForNextGame();
     }
   }
 
-  function movePlayer(location: number) {
+  function movePlayer(location: number, animate: boolean = false) {
+    if (!animate) {
+      players[currentPlayer].location = location;
+    }
     players[currentPlayer].location = location;
-    setPlayers([...players]);
   }
 
   function rollDoneCallback(total: number, individual: number[]) {
     takeTurn(total, individual);
   }
 
-  function close() {
-    setIsTurnDisplayOpen(false);
+  function resetForNextGame() {
+    for (const player of players) {
+      player.location = 0;
+      player.isStuck = false;
+      player.skipTurn = false;
+    }
+    setPlayers([...players]);
+  }
+
+  function nextTurn() {
     setEvent(GameEvent.None);
+    nextPlayer();
+  }
+
+  function nextPlayer() {
     let nextPlayer = (currentPlayer + 1) % players.length;
     if (turnOne && nextPlayer === 0) {
       setTurnOne(false);
@@ -119,6 +170,11 @@ function TurnDisplay() {
       nextPlayer = (nextPlayer + 1) % players.length;
     }
     setCurrentPlayer(nextPlayer);
+  }
+
+  function close() {
+    setIsTurnDisplayOpen(false);
+    nextTurn();
   }
 
   useEffect(() => {
@@ -140,7 +196,7 @@ function TurnDisplay() {
         ref={(dice: any) => setDice(dice)}
       />
       <GameEventDisplay event={event} />
-      <button onClick={close}>klaar</button>
+      {!automate ? <button onClick={close}>klaar</button> : <></>}
     </Modal>
   );
 }
