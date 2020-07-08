@@ -15,7 +15,7 @@ function TurnDisplay() {
   const [currentPlayer, setCurrentPlayer] = useGlobalState("currentPlayer");
   const [dice, setDice] = useState<any>();
   const [event, setEvent] = useState<GameEvent>(GameEvent.None);
-  const [, setLastTurn] = useGlobalState("lastTurn");
+  const [lastTurn, setLastTurn] = useGlobalState("lastTurn");
   const [, setIsPlaying] = useGlobalState("isPlaying");
   const [turnOne, setTurnOne] = useGlobalState("turnOne");
   const [automate] = useGlobalState("automate");
@@ -51,20 +51,16 @@ function TurnDisplay() {
         postRollLocation = 26;
       }
     }
-    if (postRollLocation % 9 === 0 || (postRollLocation + 4) % 9 === 0) {
+    if (
+      postRollLocation < 63 &&
+      (postRollLocation % 9 === 0 || (postRollLocation + 4) % 9 === 0)
+    ) {
       setEvent(GameEvent.Yippah);
       postRollLocation += total;
     }
     if (postRollLocation > 63) {
       const overshoot = postRollLocation - 63;
       postRollLocation = 63 - overshoot;
-      console.log(
-        "Overshoot Icurrent, roll, postroll, overshoot)",
-        currentLocation,
-        total,
-        postRollLocation,
-        overshoot
-      );
     }
     switch (postRollLocation) {
       case 6:
@@ -101,6 +97,7 @@ function TurnDisplay() {
       to: postRollLocation,
       player: players[currentPlayer],
       roll: total,
+      event: event,
     });
     if (players[currentPlayer].location === 63) {
       players[currentPlayer].wins++;
@@ -176,6 +173,12 @@ function TurnDisplay() {
     setIsTurnDisplayOpen(false);
     nextTurn();
   }
+
+  useEffect(() => {
+    if (lastTurn.roll === 3 && lastTurn.from === 60) {
+      console.debug(lastTurn);
+    }
+  }, [lastTurn]);
 
   useEffect(() => {
     dice?.rollAll(19);

@@ -1,11 +1,13 @@
 import { createGlobalState } from "react-hooks-global-state";
 import { Player } from "./player";
+import { GameEvent } from "./Components/GameEventDisplay";
 
 export interface Turn {
   player: Player,
   from: number,
   to: number,
   roll: number,
+  event: GameEvent
 }
 
 export const { useGlobalState } = createGlobalState({
