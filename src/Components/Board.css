@@ -1,5 +1,5 @@
 :root {
-  --square-size: min(9vh, 9vw);
+  --square-size: min(6vh, 6vw);
 }
 
 .board-grid {
@@ -17,6 +17,9 @@
   background: ghostwhite;
   border: 1px solid black;
   text-align: center;
+  whitespace: no-wrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .goose {
