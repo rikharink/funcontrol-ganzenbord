@@ -5,6 +5,8 @@ import { useGlobalState } from "../state";
 import ReactDice from "react-dice-complete";
 import GameEventDisplay, { GameEvent } from "./GameEventDisplay";
 
+const TURN_TIME = 2500;
+
 Modal.setAppElement("#root");
 
 function TurnDisplay() {
@@ -111,7 +113,7 @@ function TurnDisplay() {
       setTimeout(() => {
         nextTurn();
         dice?.rollAll();
-      }, 1000);
+      }, TURN_TIME);
     }
   }
 
@@ -198,6 +200,13 @@ function TurnDisplay() {
         dotColor={"#000000"}
         ref={(dice: any) => setDice(dice)}
       />
+      {lastTurn.from !== undefined ? (
+        <span>
+          {lastTurn.from} --&gt; {lastTurn.to}
+        </span>
+      ) : (
+        <></>
+      )}
       <GameEventDisplay event={event} />
       {!automate ? <button onClick={close}>klaar</button> : <></>}
     </Modal>

@@ -1,17 +1,14 @@
-
-
 .App {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 .side-left,
 .side-right {
   background: ghostwhite;
   flex-basis: 20vw;
-  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -28,4 +25,15 @@
 
 .hidden {
   opacity: 0;
+}
+
+.main h2 {
+  text-align: center;
+}
+
+
+@media only screen and (min-width: 1200px) {
+  .App {
+    flex-direction: row;
+  }
 }
